@@ -22,7 +22,7 @@ const float default_worth = 1;
  */
 Player::Player(Side side) {
     //NOTE: mode is set
-    mode = 0; 
+    mode = 2; 
     
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
@@ -119,14 +119,13 @@ Move * Player::doMove(Move *opponentsMove, int msLeft) {
 			todo = minimaxmove(2);
 			break;
 		default: 
-			todo = minimaxmove(3);
+			todo = mm2move(4);//mm2move(4);
 	}
 	b->doMove(todo, s);
 	return todo;
 }
 
 Move * Player::simplemove(Move *opponentsMove){
-	
 	Move * best_option;
 	float best_h = -100;
 	bool move_found =false;
@@ -253,6 +252,146 @@ float Player::minimax(Board * b, Side s, int levels_left){
 	}
 	return best;
 }
+
+time_t start_time;
+time_t timer;
+float move_sec;
+const float time_buffer = 0.5;
+
+bool Player::finish_up(){
+	return false;
+	/*
+	time(&timer);
+	float time_elapsed = difftime(start_time, timer);
+	return time_elapsed > (move_sec/2 - time_buffer) */
+	
+}
+
+int Player::moves_left(Board * b){
+	return dim * dim - (b->countWhite() + b->countBlack());
+}
+
+/*
+Move* Player mm2m(float time){
+	int min = 3;
+	int max = 5;
+	move_sec = time;
+	time(&start_time);
+	time_alloted = move_sec/(ceil(((float)moves_left())/2);
+	
+	move_value best;
+	best.v = -inf;
+	
+	for(int i = min; i <= max; i++)
+		move_value mv = mm2move(min);
+		if(mv.v > best.v){
+			best = mv;
+		}
+		if(finish_up()) return best.m;
+	}
+}
+*/
+
+Move* Player::mm2move(int l){
+	Move* best;
+	float v = -inf;
+	vector<Move*> op = options(b, s);
+
+	Move* best_move;
+	if(op.size() == 0){
+		return nullptr;
+	}
+	for(int i = 0; i < op.size(); i++){
+		float value;
+		Board * nb = b->copy();
+		nb->doMove(op[i], s);
+		if(l==0){
+			value = dual_heur(nb, op, s).vm;
+		}else{
+			value = mm2(nb, opp(s), l - 1).vm;
+		}
+		bool condition;
+		
+		condition = value > v;
+		
+		if(condition){
+			v = value;
+			best = op[i];
+		}	
+	}
+	return best;
+}
+
+dual_value Player::mm2(Board * b, Side s, int l){
+	vector <Move*> op = options(b, s);
+	dual_value best;
+	best.vm = -inf;
+	best.vo = -inf;
+	if(op.size() == 0){
+		if(l == 0 || finish_up()){
+			return dual_heur(b, op, s);
+		}else{
+			return mm2(b, opp(s), l - 1);
+		}
+	}
+	for(int i = 0; i < op.size(); i++){
+
+		dual_value value;
+		Board * nb = b->copy();
+		nb->doMove(op[i], s);
+		if(l == 0 || finish_up()){
+			value = dual_heur(nb, op, s);
+		}else{
+			value = mm2(nb, opp(s), l - 1);
+		}
+		bool condition;
+		if(s == this->s){
+			condition = value.vm > best.vm;
+		}else{
+			condition = value.vo > best.vo;
+		}
+		if(condition){
+			best = value;
+		}	
+	}
+	return best;
+}
+
+dual_value Player::dual_heur(Board * b, vector<Move*>op, Side s){
+	dual_value dv;
+	dv.vm = my_heur(b, op, s);
+	dv.vo = opp_heur(b, op, s);
+	return dv;
+}
+
+
+float const long_weight = 2;
+float const mul = 2;
+float Player::my_heur(Board * b, vector<Move*> op, Side s){
+	
+	vector<Move*> opp_op = options(b, opp(s));
+	float v = (1+(log((double)op.size() + 1))/(1+log((double)opp_op.size() + 1)));
+	if(s == this->s){
+		//v *= 1;
+	}else{
+		
+		v*= -1;
+	}
+	float a = heur0(b);
+	//float d = heur1(b);
+	std::cerr << long_weight * a << "/" << v/fabs(a) << std::endl; 
+	
+	return  long_weight * a + v/fabs(a);
+	
+	//return heur0(b);
+}
+
+float Player::opp_heur(Board * b, vector<Move*> op, Side s){
+	return heur0(b);
+}
+
+
+
     /*
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move

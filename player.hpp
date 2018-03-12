@@ -6,13 +6,22 @@
 #include <limits>
 #include "board.hpp"
 #include <vector>
+#include <time.h>
+#include <math.h>
 
 using namespace std;
 
-struct move_value{
-	Move m;
-	float v;
+struct dual_value{
+	float vm;
+	float vo;
 };
+
+/*
+struct move_value{
+	Move * m;
+	float v;
+}
+*/
 
 class Player {
 
@@ -39,6 +48,15 @@ private:
 	Move * simplemove(Move *opponentsMove);
 	bool corner(int x, int y);
 	bool edge(int x, int y);
+	dual_value mm2(Board * b, Side s, int l);
+	Move* mm2move(int l);
+	int moves_left(Board * b);
+	float my_heur(Board * b, vector<Move*> op, Side s);
+	dual_value dual_heur(Board * b, vector<Move*> op, Side s);
+	float opp_heur(Board * b, vector<Move*> op, Side s);
+	
+	bool finish_up();
+	
 };
 
 #endif

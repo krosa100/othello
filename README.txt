@@ -1,0 +1,18 @@
+(1) A new board heuristic was designed which takes into account the number of available moves as well as the positional (feature based) piece distribution. In particular, the number of moves remaining were considered like iterations in the addition of a random variable to the positional heuristic. This random variable was taken to be normally distributed and representative of the maximum marginal change in the positional heuristic. As the maximum of the set of options, its magnitude was chosen to be proportionate to the function which relates the average percentile of any extrema (in the relevant dimension) and the sample size: found to be logarithm (with coefficient equal to half the standard deviation). The standard deviation of change in the positional heuristic was empirically estimated and used to proxy this (other) standard deviation.
+
+(2) It was observed that the minimax algorithm implicitly assumes an opponent heuristic similar to that employed by the player. While not a wholly unreasonable assumption given the natural correlation of all reasonably chosen heuristics to the reality of a state's advantage (and thus consequently mutual correlation), the possibly unusual nature of my algorithm (above) might limit this correlation. Therefore, the minimax algorithm was revised to simulate the dual perception of the game state - using different heuristics for the "minimization" and the maximization (since the opponent heuristic is no longer implicitly the negative of the player's, the opponent's minimization is in my revised algorithm to a maximization).
+The opponent's heuristic used is that vaguely alluded to in the part 9 preface - likely to be popular.
+
+(3) An attempt to efficiently utilize the alloted time was made. First, a maximum iteration length was empirically found; given the (somewhat) more intensive nature of the heuristic, it was found to be lower than that of the conventional minimax: 3 not 4.  Assuming this was due to computational speed (as opposed to memory), a timer system  was implemented to replace the iteration cap. To circumvent the depth first nature of recursion, the algorithm was to be called with increasing iterations and interrupted from a separate thread and then the maximum value compared from the last two iterations (since the final was likely interrupted). However, after memory diagnostics uncovered that the initial issue with 4 iterations was with memory, I realized the optimization would be time-consuming and negligible; I directed my attention elsewhere.
+
+(4) Compilation optimization was enabled.
+
+The first refinement (1) is essentially a statistical equilibrium approximation of what minimax would find. Efficient algorithms dedicated computational resources in proportion to the ultimate consequence of the task. Given the harmonically inconsequential nature of considering subsequent hypothetical scenarios, it makes sense for the ai to be increasingly approximate. 
+
+The second refinement (2) addresses the game theoretic side of competitive interaction. While anticipating an opponent's actions is not a part of Nash equilibrium (where static, opponent-independent probabilities independent), it's the essence of any approximation/optimization thereof and is necessary to systematically outperform. 
+
+In short, my AI implements two features theoretically indispensable and yet neglected (understandably) in the course material; therefore, while I have my own doubts about how aIgo will perform in the tournament, I am nonetheless proud to assert that he is tournament-worthy - that is, worthy of the tournament and only glorified in defeat (to do some conceptually right things and fail anyways is martyrdom, imo).
+
+ 
+
+
